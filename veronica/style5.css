@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  justify-content: space-around; /* Горизонтальное выравнивание элементов по центру */
+  align-items: flex-end; /* Вертикальное выравнивание элементов внизу */
+  border: 1px solid black;
+  height: 50px;
+}
+
+.item1 {
+  flex-grow: 1;
+  background: red;
+}
+.item2 {
+  flex-grow: 2;
+  background: green;
+}
+.item3 {
+  flex-grow: 1;
+  background: red;
+}
+
+
+/* 
+.item1 {
+  background: red;
+  flex-basis: 100px;
+}
+
+.item2 {
+  background: green;
+  flex-basis: 150px;
+}
+
+.item3 {
+  background: red;
+  flex-basis: 200px;
+} */
+
+

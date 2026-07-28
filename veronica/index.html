@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <!-- Кодировка и адаптивность под мобильные -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebStart - Обучение с нуля</title>
+    <!-- Подключение таблицы стилей -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Шапка: логотип + навигация + кнопка -->
+    <header class="header">
+        <div class="container header__inner">
+            <a href="#" class="logo">WebStart 🚀</a>
+            <nav class="nav">
+                <a href="#features" class="nav__link">Возможности</a>
+                <a href="#contact" class="nav__link">Контакты</a>
+            </nav>
+            <button id="theme-toggle" class="btn btn--outline">🌙 Тема</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Главный экран -->
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero__title">Создавай сайты <span class="highlight">легко</span></h1>
+                <p class="hero__desc">Простой шаблон для изучения HTML, CSS и JavaScript. Каждый файл прокомментирован.</p>
+                <a href="#features" class="btn btn--primary">Начать изучение</a>
+            </div>
+        </section>
+
+        <!-- Карточки -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Что мы изучаем?</h2>
+                <div class="cards">
+                    <article class="card">
+                        <div class="card__icon">📄</div>
+                        <h3 class="card__title">HTML</h3>
+                        <p class="card__text">Скелет и структура страницы. Разметка контента.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card__icon">🎨</div>
+                        <h3 class="card__title">CSS</h3>
+                        <p class="card__text">Внешний вид, цвета, отступы и адаптивность.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card__icon">⚡</div>
+                        <h3 class="card__title">JavaScript</h3>
+                        <p class="card__text">Интерактивность, анимации и работа с данными.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Форма -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="section-title">Задай вопрос</h2>
+                <form id="contact-form" class="form">
+                    <input type="text" id="name" placeholder="Ваше имя" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <textarea id="message" rows="4" placeholder="Сообщение"></textarea>
+                    <button type="submit" class="btn btn--primary">Отправить</button>
+                    <p id="form-status" class="status-msg"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p id="WebStart">2026 WebStart. Сделано для обучения.</p>
+        </div>
+    </footer>
+
+    <!-- Скрипт подключаем в конце, чтобы HTML успел загрузиться -->
+    <script src="script.js"></script>
+</body>
+</html>

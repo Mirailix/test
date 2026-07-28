@@ -1,0 +1,160 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 10px;
+  background: linear-gradient(to right, #414345, #232526);
+  background: linear-gradient(to right, #ece9e6, #ffffff);
+  -webkit-text-shadow: 3px 5px 7px rgba(31,  36,  32, 0.55);
+  -moz-text-shadow: 3px 5px 7px rgba(31,  36,  32, 0.55);
+  text-shadow: 3px 5px 7px rgba(31,  36,  32, 0.55);
+}
+
+
+.calc {
+  width: 500px;
+  padding: 1.5em;
+  background: linear-gradient(to bottom, white, rgba(0, 0, 0, 0)) 100% 0%/100% 20%, linear-gradient(50deg, white, rgba(0, 0, 0, 0.02)) 100% 0%/100% 100%, linear-gradient(to right, rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.01)) 100% 0%/100% 100%, linear-gradient(to bottom, rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.02)) 100% 0%/100% 100%, #fff;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 3fr;
+  row-gap: 1.5em;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.5) 0px 3px 5px -3px, rgba(0, 0, 0, 0.1) 0px -2px 8px 0px inset, white 0px 15px 8px -5px inset;
+}
+@media (max-width: 576px) {
+  .calc {
+    width: 90vw;
+  }
+}
+.calc .result {
+  background: linear-gradient(to right, #414345, #232526, #414345);
+  box-shadow: rgba(0, 0, 0, 0.2) 0.3em 0.3em 0.6em 0px inset, rgba(0, 0, 0, 0.25) -3px -3px 0.6em 0.1em inset, rgba(0, 0, 0, 0.25) 0px 0em 1.2em 0px inset, rgba(0, 0, 0, 0.25) 0px 0.3em 0.2em 0px inset;
+  background-repeat: no-repeat;
+  padding: 1.5em;
+}
+.calc .result .result__inner {
+  text-shadow: 0.15em 0.15em rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  color: #fff;
+  height: 100%;
+  font-family: "PT Mono", monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.calc .result .result__inner.smaller-font .current-operand {
+  font-size: clamp(1rem, 0.5005rem + 2.22vw, 1.875rem);
+}
+.calc .result .result__inner .prev-operand {
+  font-size: 2em;
+}
+.calc .result .result__inner .current-operand {
+  font-size: clamp(1.5625rem, 1.027rem + 2.38vw, 2.5rem);
+}
+.calc .keypad {
+  background: #fff;
+  flex-grow: 2;
+}
+.calc .keypad__inner {
+  height: 100%;
+  gap: 1.5em;
+}
+.calc .key {
+  color: rgba(0, 0, 0, 0.7);
+  border: unset;
+  padding: 0.7rem;
+  border: 1px solid #e8e3df;
+  font-family: "Rubik", sans-serif;
+  font-size: clamp(1rem, 0.4285rem + 2.54vw, 2rem);
+  background:#faf6f2;
+  background:rgba(249, 244, 239	,.8);
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  transition: all 0.25s ease;
+}
+.calc .key__row {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0.5em;
+}
+@media (max-width: 576px) {
+  .calc .key__row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.calc .key:hover {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+.calc .key[data-up] img, .calc .key[data-down] img {
+  max-width: 1.5rem;
+}
+@media (max-width: 576px) {
+  .calc .key[data-up] img, .calc .key[data-down] img {
+    max-width: 1.2rem;
+  }
+}
+.calc .key[data-operator="+"] {
+  grid-row: 3/3;
+  grid-column: 4/4;
+}
+.calc .key[data-number] {
+  font-size: clamp(1.5625rem, 1.027rem + 2.38vw, 2.5rem);
+}
+.calc .key[data-number="4"] {
+  grid-row: 4/4;
+}
+.calc .key[data-number="5"] {
+  grid-row: 4/4;
+}
+.calc .key[data-number="6"] {
+  grid-row: 4/4;
+}
+.calc .key[data-number="1"] {
+  grid-row: 5/5;
+}
+.calc .key[data-number="2"] {
+  grid-row: 5/5;
+}
+.calc .key[data-number="3"] {
+  grid-row: 5/5;
+}
+.calc .key[data-number="0"] {
+  grid-row: 6/6;
+  grid-column: 1/3;
+}
+.calc .key[data-number="."] {
+  grid-row: 6/6;
+}
+.calc .key[data-equals] {
+  font-size: 3rem;
+  grid-row: 4/7;
+  grid-column: 4/4;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.25) 0px 2px 6px 2px;
+  background: linear-gradient(30deg, #d1fd47, #baf503);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
+.calc .key[data-equals]:hover {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}

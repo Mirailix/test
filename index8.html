@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Крестики-нолики</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 50%, #1a1a2e 100%);
+    color: #e8e8f0;
+    padding: 20px;
+  }
+
+  .game {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #ff6b9d, #c06cff, #6bb5ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e8e8f0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  button.active {
+    background: linear-gradient(135deg, #ff6b9d, #c06cff);
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(192, 108, 255, 0.4);
+  }
+
+  canvas {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .status {
+    margin-top: 20px;
+    font-size: 1.15rem;
+    min-height: 30px;
+    font-weight: 500;
+  }
+
+  .score {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    font-size: 0.95rem;
+  }
+
+  .score div span {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .score .x span { color: #ff6b9d; }
+  .score .o span { color: #6bb5ff; }
+  .score .d span { color: #c06cff; }
+</style>
+</head>
+<body>
+  <div class="game">
+    <h1>КРЕСТИКИ-НОЛИКИ</h1>
+
+    <div class="controls">
+      <button id="mode2p" class="active">2 игрока</button>
+      <button id="modeAi">Против ИИ</button>
+      <button id="reset">Новая игра</button>
+    </div>
+
+    <canvas id="board" width="420" height="420"></canvas>
+
+    <div class="status" id="status">Ход: X</div>
+
+    <div class="score">
+      <div class="x">X <span id="scoreX">0</span></div>
+      <div class="d">Ничья <span id="scoreD">0</span></div>
+      <div class="o">O <span id="scoreO">0</span></div>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const scoreX = document.getElementById('scoreX');
+const scoreO = document.getElementById('scoreO');
+const scoreD = document.getElementById('scoreD');
+
+const SIZE = 3;
+const CELL = canvas.width / SIZE;
+
+let board = Array(SIZE * SIZE).fill(null);
+let current = 'X';
+let gameOver = false;
+let winLine = null;
+let aiMode = false;
+let scores = { X: 0, O: 0, D: 0 };
+let animations = []; // {cell, type, progress}
+
+// ===== Отрисовка =====
+function drawGrid() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 2;
+  for (let i = 1; i < SIZE; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * CELL, 0);
+    ctx.lineTo(i * CELL, canvas.height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, i * CELL);
+    ctx.lineTo(canvas.width, i * CELL);
+    ctx.stroke();
+  }
+}
+
+function drawX(x, y, size, progress) {
+  ctx.strokeStyle = '#ff6b9d';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  const half = size / 2;
+  const cx = x + size / 2;
+  const cy = y + size / 2;
+  const p = Math.min(progress, 1);
+
+  // Первая линия
+  if (p <= 0.5) {
+    const t = p * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx - half, cy - half);
+    ctx.lineTo(cx - half + size * t, cy - half + size * t);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(cx - half, cy - half);
+    ctx.lineTo(cx + half, cy + half);
+    ctx.stroke();
+    const t = (p - 0.5) * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + half, cy - half);
+    ctx.lineTo(cx + half - size * t, cy - half + size * t);
+    ctx.stroke();
+  }
+}
+
+function drawO(x, y, size, progress) {
+  ctx.strokeStyle = '#6bb5ff';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  const cx = x + size / 2;
+  const cy = y + size / 2;
+  const r = size / 2 - 10;
+  const p = Math.min(progress, 1);
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p);
+  ctx.stroke();
+}
+
+function drawWinLine() {
+  if (!winLine) return;
+  const [a, b] = winLine;
+  const x1 = (a % SIZE) * CELL + CELL / 2;
+  const y1 = Math.floor(a / SIZE) * CELL + CELL / 2;
+  const x2 = (b % SIZE) * CELL + CELL / 2;
+  const y2 = Math.floor(b / SIZE) * CELL + CELL / 2;
+
+  ctx.strokeStyle = '#ffd93d';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = '#ffd93d';
+  ctx.shadowBlur = 20;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+function render() {
+  drawGrid();
+
+  for (let i = 0; i < board.length; i++) {
+    if (board[i]) {
+      const x = (i % SIZE) * CELL;
+      const y = Math.floor(i / SIZE) * CELL;
+      const anim = animations.find(a => a.cell === i);
+      const progress = anim ? anim.progress : 1;
+      const pad = 15;
+      if (board[i] === 'X') drawX(x + pad, y + pad, CELL - pad * 2, progress);
+      else drawO(x + pad, y + pad, CELL - pad * 2, progress);
+    }
+  }
+
+  drawWinLine();
+}
+
+// ===== Анимация =====
+let lastTime = 0;
+function animate(time) {
+  const dt = (time - lastTime) / 1000;
+  lastTime = time;
+
+  let needRender = false;
+  for (const a of animations) {
+    if (a.progress < 1) {
+      a.progress += dt * 3;
+      needRender = true;
+    }
+  }
+  if (needRender) render();
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(t => { lastTime = t; animate(t); });
+
+// ===== Логика =====
+const WIN_LINES = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function checkWinner(b) {
+  for (const line of WIN_LINES) {
+    const [a, c, d] = line;
+    if (b[a] && b[a] === b[c] && b[a] === b[d]) {
+      return { winner: b[a], line: [a, d] };
+    }
+  }
+  if (b.every(v => v)) return { winner: 'D', line: null };
+  return null;
+}
+
+function updateStatus() {
+  if (gameOver) return;
+  const label = aiMode && current === 'O' ? 'ИИ думает...' : `Ход: ${current}`;
+  statusEl.textContent = label;
+}
+
+function makeMove(cell) {
+  if (board[cell] || gameOver) return false;
+  board[cell] = current;
+  animations.push({ cell, type: current, progress: 0 });
+
+  const result = checkWinner(board);
+  if (result) {
+    gameOver = true;
+    winLine = result.line;
+    render();
+    if (result.winner === 'D') {
+      statusEl.textContent = 'Ничья!';
+      scores.D++;
+      scoreD.textContent = scores.D;
+    } else {
+      statusEl.textContent = `Победил: ${result.winner}!`;
+      scores[result.winner]++;
+      (result.winner === 'X' ? scoreX : scoreO).textContent = scores[result.winner];
+    }
+    return true;
+  }
+
+  current = current === 'X' ? 'O' : 'X';
+  updateStatus();
+  render();
+  return true;
+}
+
+// ===== ИИ (минимакс с альфа-бета отсечением) =====
+function minimax(b, player, alpha, beta) {
+  const result = checkWinner(b);
+  if (result) {
+    if (result.winner === 'O') return 10;
+    if (result.winner === 'X') return -10;
+    return 0;
+  }
+
+  if (player === 'O') {
+    let best = -Infinity;
+    for (let i = 0; i < b.length; i++) {
+      if (!b[i]) {
+        b[i] = 'O';
+        const score = minimax(b, 'X', alpha, beta);
+        b[i] = null;
+        best = Math.max(best, score);
+        alpha = Math.max(alpha, score);
+        if (beta <= alpha) break;
+      }
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (let i = 0; i < b.length; i++) {
+      if (!b[i]) {
+        b[i] = 'X';
+        const score = minimax(b, 'O', alpha, beta);
+        b[i] = null;
+        best = Math.min(best, score);
+        beta = Math.min(beta, score);
+        if (beta <= alpha) break;
+      }
+    }
+    return best;
+  }
+}
+
+function aiMove() {
+  if (gameOver || current !== 'O') return;
+  let bestScore = -Infinity;
+  let bestMove = -1;
+  for (let i = 0; i < board.length; i++) {
+    if (!board[i]) {
+      board[i] = 'O';
+      const score = minimax(board, 'X', -Infinity, Infinity);
+      board[i] = null;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = i;
+      }
+    }
+  }
+  if (bestMove !== -1) {
+    setTimeout(() => makeMove(bestMove), 300);
+  }
+}
+
+// ===== События =====
+canvas.addEventListener('click', (e) => {
+  if (gameOver) return;
+  if (aiMode && current === 'O') return;
+
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const col = Math.floor(x / CELL);
+  const row = Math.floor(y / CELL);
+  const cell = row * SIZE + col;
+
+  if (makeMove(cell) && aiMode && !gameOver) {
+    aiMove();
+  }
+});
+
+document.getElementById('mode2p').addEventListener('click', () => {
+  aiMode = false;
+  document.getElementById('mode2p').classList.add('active');
+  document.getElementById('modeAi').classList.remove('active');
+  resetGame();
+});
+
+document.getElementById('modeAi').addEventListener('click', () => {
+  aiMode = true;
+  document.getElementById('modeAi').classList.add('active');
+  document.getElementById('mode2p').classList.remove('active');
+  resetGame();
+});
+
+document.getElementById('reset').addEventListener('click', resetGame);
+
+function resetGame() {
+  board = Array(SIZE * SIZE).fill(null);
+  current = 'X';
+  gameOver = false;
+  winLine = null;
+  animations = [];
+  updateStatus();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

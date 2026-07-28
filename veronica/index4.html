@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Timer</title>
+    <link rel="stylesheet" href="style4.css">
+</head>
+<body>
+    <div class="timer-container">
+        <input type="number" id="hours" placeholder="Hours" min="0">
+        <input type="number" id="minutes" placeholder="Minutes" min="0" max="59">
+        <input type="number" id="seconds" placeholder="Seconds" min="0" max="59">
+        <button id="start-button">Start Timer</button>
+        <div id="timer-display">00:00:00</div>
+    </div>
+    <audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
+    <script src="script2.js"></script>
+</body>
+</html>

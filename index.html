@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- Подключение CSS -->
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Калькулятор</title>
+</head>
+<body>
+  <div class="calc">
+  <div class="result">
+    <div class="result__inner">
+      <div data-prev-operand class="prev-operand">
+
+      </div>
+      <div data-current-operand class="current-operand">
+      </div>
+    </div>
+  </div>
+  <div class="keypad">
+    <div class="keys__inner">
+      <div class="key__row">
+        <button data-clear class="key" aria-label="Clear">AC</button>
+        <button data-delete class="key" label="Delete">DEL</button>
+        
+        <button  data-up class="key" aria-label="Memory up">
+           <img src="https://assets.codepen.io/2970881/arrow-up.svg" alt="Memory up" />
+        </button>
+        <button data-down class="key" aria-label="Memory down">
+          <img src="https://assets.codepen.io/2970881/arrow-down.svg" alt="Memory down" />
+        </button>
+        <button data-operator="**" label="Exponent" class="key">x<sup>2</sup></button>
+        <button data-operator="/" label="Divide" class="key">&#247;</button>
+        <button data-operator="*" label="Multiply" class="key">X</button>
+        <button data-operator="-" label="Minus" class="key">-</button>
+        <button data-operator="+" label="Plus" class="key">+</button>
+        <button data-number="7" class="key">7</button>
+        <button data-number="8" class="key">8</button>
+        <button data-number="9" class="key">9</button>
+        
+        <button data-number="4" class="key">4</button>
+        <button data-number="5"  class="key">5</button>
+        <button data-number="6"  class="key">6</button>
+        
+        <button data-number="1" class="key">1</button>
+        <button data-number="2" class="key">2</button>
+        <button data-number="3" class="key">3</button>
+
+        <button data-number="0" class="key">0</button>
+
+        <button data-number="." class="key">.</button>
+        <button data-equals aria-label="Equals" class="key">=</button>
+        
+
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Mini Games</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --primary: #e94560;
+            --secondary: #0f3460;
+            --text: #fff;
+            --accent: #16213e;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 { margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* --- НАВИГАЦИЯ (RADIO HACK) --- */
+        .nav-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input[type="radio"] { display: none; }
+
+        .nav-label {
+            padding: 10px 20px;
+            background: var(--secondary);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .nav-label:hover { background: var(--primary); }
+
+        /* Логика переключения экранов */
+        #game1:checked ~ .game-container #screen1,
+        #game2:checked ~ .game-container #screen2,
+        #game3:checked ~ .game-container #screen3,
+        #game4:checked ~ .game-container #screen4,
+        #game5:checked ~ .game-container #screen5 {
+            display: flex;
+        }
+
+        #game1:checked ~ .nav-container label[for="game1"],
+        #game2:checked ~ .nav-container label[for="game2"],
+        #game3:checked ~ .nav-container label[for="game3"],
+        #game4:checked ~ .nav-container label[for="game4"],
+        #game5:checked ~ .nav-container label[for="game5"] {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* --- КОНТЕЙНЕР ИГРЫ --- */
+        .game-container {
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+            background: var(--accent);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--secondary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            display: none; /* Скрыто по умолчанию */
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* По умолчанию показываем первую игру */
+        #screen1 { display: flex; }
+
+        .instruction {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        /* --- ИГРА 1: ЛАБИРИНТ --- */
+        .maze {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: #fff;
+        }
+        .maze-path {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .maze-wall {
+            position: absolute;
+            background: var(--primary);
+        }
+        /* Стены лабиринта */
+        .w1 { top: 0; left: 0; width: 200px; height: 20px; }
+        .w2 { top: 0; right: 0; width: 20px; height: 200px; }
+        .w3 { top: 100px; left: 50px; width: 200px; height: 20px; }
+        .w4 { bottom: 0; left: 100px; width: 20px; height: 200px; }
+        .w5 { bottom: 50px; left: 0; width: 100px; height: 20px; }
+        
+        .start-zone {
+            position: absolute; top: 10px; left: 10px; width: 30px; height: 30px;
+            background: green; border-radius: 50%; z-index: 2;
+        }
+        .end-zone {
+            position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px;
+            background: gold; border-radius: 50%; z-index: 2;
+        }
+        /* Логика проигрыша: если наводишь на стену - она краснеет и появляется текст */
+        .maze-wall:hover::after {
+            content: "ОЙ! СТЕНА!";
+            position: absolute; top: -30px; left: 0;
+            color: red; font-weight: bold; white-space: nowrap;
+        }
+        .maze-wall:hover { background: red; }
+
+        /* --- ИГРА 2: ЛОВЕЦ --- */
+        .catcher-area {
+            width: 100%; height: 100%; position: relative;
+            overflow: hidden; cursor: crosshair;
+        }
+        .ball {
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, #00ff00, #004400);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: moveBall 4s infinite linear alternate;
+        }
+        .ball:hover {
+            background: red;
+            transform: translate(-50%, -50%) scale(1.5);
+            cursor: pointer;
+        }
+        .ball:hover::after {
+            content: "ПОЙМАЛ!";
+            position: absolute; top: -30px; left: 0; color: white;
+        }
+        @keyframes moveBall {
+            0% { top: 10%; left: 10%; }
+            25% { top: 10%; left: 90%; }
+            50% { top: 90%; left: 90%; }
+            75% { top: 90%; left: 10%; }
+            100% { top: 50%; left: 50%; }
+        }
+
+        /* --- ИГРА 3: УДЕРЖАНИЕ --- */
+        .hold-btn {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            border: none;
+            background: var(--secondary);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.1s;
+        }
+        .hold-btn:active {
+            background: var(--primary);
+            transform: scale(0.95);
+        }
+        /* Анимация заполнения при нажатии */
+        .hold-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 0%;
+            background: rgba(255,255,255,0.3);
+            transition: height 0.1s;
+        }
+        .hold-btn:active::after {
+            height: 100%;
+            transition: height 3s linear; /* 3 секунды удержания */
+        }
+        .hold-btn:active span {
+            display: none; /* Скрываем текст пока держим */
+        }
+        /* Если удержал 3 секунды (симуляция через animation-delay hack сложно, сделаем просто визуально) */
+        .hold-btn:active:hover::after {
+             /* В чистом CSS сложно определить "победу" по времени без JS, 
+                но мы можем сделать визуальный эффект заполнения */
+        }
+
+        /* --- ИГРА 4: УГАДАЙ КАРТУ --- */
+        .cards {
+            display: flex; gap: 20px;
+        }
+        .card {
+            width: 80px; height: 120px;
+            background: white;
+            color: black;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 5px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .card-back {
+            background: #333; color: #fff;
+            transform: rotateY(180deg);
+            font-size: 1em;
+        }
+        .card:hover {
+            transform: rotateY(180deg);
+        }
+
+        /* --- ИГРА 5: КРЕСТИКИ-НОЛИКИ (ВИЗУАЛ) --- */
+        .tictactoe {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 5px;
+        }
+        .cell {
+            background: rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 3em; cursor: pointer;
+            user-select: none;
+        }
+        .cell:hover { background: rgba(255,255,255,0.2); }
+        /* Используем radio hack внутри игры для переключения X и O */
+        .cell input { display: none; }
+        .cell label { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer;}
+        
+        /* Логика переключения: Клик 1 -> X, Клик 2 -> O (очень упрощенно) */
+        /* Для простоты сделаем просто кликабельные ячейки, которые меняют символ при каждом клике через :active? Нет, :active только пока держишь. 
+           Сделаем так: просто красивые ячейки, игрок сам договаривается кто ходит. */
+        .cell:active { color: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Радио кнопки для навигации -->
+    <input type="radio" name="game" id="game1" checked>
+    <input type="radio" name="game" id="game2">
+    <input type="radio" name="game" id="game3">
+    <input type="radio" name="game" id="game4">
+    <input type="radio" name="game" id="game5">
+
+    <h1>CSS Arcade</h1>
+
+    <div class="nav-container">
+        <label for="game1" class="nav-label">Лабиринт</label>
+        <label for="game2" class="nav-label">Ловец</label>
+        <label for="game3" class="nav-label">Удержание</label>
+        <label for="game4" class="nav-label">Угадай</label>
+        <label for="game5" class="nav-label">Крестики-Нолики</label>
+    </div>
+
+    <div class="game-container">
+        
+        <!-- ИГРА 1: ЛАБИРИНТ -->
+        <div id="screen1" class="screen">
+            <h2>Лабиринт</h2>
+            <p class="instruction">Проведи мышкой от Зеленого к Золотому. Не касайся красных стен!</p>
+            <div class="maze">
+                <div class="maze-path">
+                    <div class="start-zone"></div>
+                    <div class="end-zone"></div>
+                    <div class="maze-wall w1"></div>
+                    <div class="maze-wall w2"></div>
+                    <div class="maze-wall w3"></div>
+                    <div class="maze-wall w4"></div>
+                    <div class="maze-wall w5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ИГРА 2: ЛОВЕЦ -->
+        <div id="screen2" class="screen">
+            <h2>Поймай мяч</h2>
+            <p class="instruction">Наведи курсор на зеленый шар, пока он движется.</p>
+            <div class="catcher-area">
+                <div class="ball"></div>
+            </div>
+        </div>
+
+        <!-- ИГРА 3: УДЕРЖАНИЕ -->
+        <div id="screen3" class="screen">
+            <h2>Сила воли</h2>
+            <p class="instruction">Зажми кнопку и держи 3 секунды, чтобы заполнить круг.</p>
+            <button class="hold-btn"><span>ДЕРЖИ!</span></button>
+        </div>
+
+        <!-- ИГРА 4: УГАДАЙ КАРТУ -->
+        <div id="screen4" class="screen">
+            <h2>Найди Туза</h2>
+            <p class="instruction">Наведи на карту, чтобы перевернуть её.</p>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-front">J</div>
+                    <div class="card-back">Валет</div>
+                </div>
+                <div class="card">
+                    <div class="card-front" style="color:red">A</div>
+                    <div class="card-back" style="color:red">ТУЗ!</div>
+                </div>
+                <div class="card">
+                    <div class="card-front">J</div>
+                    <div class="card-back">Валет</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ИГРА 5: КРЕСТИКИ-НОЛИКИ -->
+        <div id="screen5" class="screen">
+            <h2>Крестики-Нолики</h2>
+            <p class="instruction">Поле для двоих. Договоритесь, кто ходит первым.</p>
+            <div class="tictactoe">
+                <div class="cell">X</div><div class="cell">O</div><div class="cell">X</div>
+                <div class="cell">O</div><div class="cell">X</div><div class="cell">O</div>
+                <div class="cell">X</div><div class="cell">O</div><div class="cell">X</div>
+            </div>
+            <p style="margin-top:10px; font-size: 0.8em; opacity: 0.5;">(Это демо-версия без логики победы)</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
